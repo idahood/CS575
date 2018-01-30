@@ -104,14 +104,29 @@ def count(data, feature, value):
 # what is the entropy of a question about feature?
 # sum the entropy over the possible values of the feature.
 def entropy(data, feature):
-    #TERRIBLE HACK FIX ME
-    return 1.0
+    #Session 5 Minute 39
+    result = 0.0
+    for f in FeatureValues['Ans']:
+        if len(data) == 0:
+            pass
+        else:
+            #print(count(data, feature, f), '/', len(data))
+            p = float(count(data, feature, f)) / len(data)
+            #print('p', p)
+            #if p != 0:
+            result += (p * -1.0) * log2(p)
+            #print('result' ,result)
+    return result
 
 # current entropy - expected entropy after getting info about feature 
 # entropy(data, "Ans") - sum_{v=featurevalues} p_v * entropy(select(data, feature, v), "Ans")
 def gain(data, feature):
-    #TERRIBLE HACK FIX ME
-    return 1.0
+    entropy_sum = 0.0
+    for f in feature:
+        entropy_sum += entropy(select(data, feature, f), 'Ans')
+    result = entropy(data, 'Ans') - entropy_sum
+    print(result)
+    return result
 
 
 # If there one and only one value for the given feature in given data 
@@ -134,7 +149,6 @@ def maxAns(data):
             AnsDict[d['Ans']] = 1
 
     result = max(AnsDict.keys(), key=(lambda k: AnsDict[k]))
-    print ('MAXANS', result)
     return result
 
 # this is the ID3 algorithm
@@ -180,9 +194,9 @@ def ID3BuildTree(data, availableFeatures):
 def main():
     readProblem()
     FeatureList.remove("Ans")
-    print("FeatureList", FeatureList)
-    print("FeatureValues", FeatureValues)
-    print("Data", Data)
+    #print("FeatureList", FeatureList)
+    #print("FeatureValues", FeatureValues)
+    #print("Data", Data)
     tree = ID3BuildTree(Data, FeatureList)
     printDTree(tree)
 
