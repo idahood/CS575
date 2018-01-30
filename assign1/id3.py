@@ -31,7 +31,7 @@ def readProblem() :
 
     # read number of samples
     numSamples = int(sys.stdin.readline())
-    
+
     # read in example classifications
     for line in sys.stdin.readlines() :
         fields = line.split()
@@ -47,7 +47,7 @@ amountIndent = 3*" "
 
 def printDTree(tree):
     printDTreeAux("", tree)
-    
+
 def printDTreeAux(indent, tree) :
     name = tree[0]
     d = tree[1]
@@ -104,23 +104,24 @@ def count(data, feature, value) :
 # what is the entropy of a question about feature?
 # sum the entropy over the possible values of the feature.
 def entropy(data, feature) :
-    result = []
-    for d in data:
-        num = 0
-        for f in feature:
-            if d[f] != 0:
-                num += -d[f] * log2(d[f])
+    #TERRIBLE HACK FIX ME
+    return 1
 
 # current entropy - expected entropy after getting info about feature 
 # entropy(data, "Ans") - sum_{v=featurevalues} p_v * entropy(select(data, feature, v), "Ans")
 def gain(data, feature) :
-    ???
+    #TERRIBLE HACK FIX ME
+    return 0.5
 
 
 # If there one and only one value for the given feature in given data 
 # If not return None
 def isOneLabel(data, feature) :
-    ???
+    labelSet = set(label for d['Ans'] in data)
+    if len(labelSet) == 1:
+        return True
+    else:
+        return False
 
 # select the most popular Ans value left in the data for the constraints
 # up to now.
@@ -141,7 +142,8 @@ def ID3BuildTree(data, availableFeatures) :
         return None
 
     # only one label for the Ans feature at this point?
-    ???
+    if isOneLabel(data, availableFeatures):
+        return data[0]['Ans']
 
     # ran out of discriminating features
     if len(availableFeatures) == 0:
@@ -162,7 +164,7 @@ def ID3BuildTree(data, availableFeatures) :
                 bestList.append(feature)
         print("BEST:", round(bestGain, 4), bestList);
         print()
-            
+
         # recursively construct tree on return
         treeLeaves = {}   # start with empty dictionary
         availableFeatures = availableFeatures[:]
