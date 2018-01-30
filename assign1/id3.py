@@ -113,7 +113,6 @@ def entropy(data, feature):
             #print(count(data, feature, f), '/', len(data))
             p = float(count(data, feature, f)) / len(data)
             #print('p', p)
-            #if p != 0:
             result += (p * -1.0) * log2(p)
             #print('result' ,result)
     #print('ENTROPY:', f, result)
@@ -197,9 +196,9 @@ def ID3BuildTree(data, availableFeatures):
 def main():
     readProblem()
     FeatureList.remove("Ans")
-    #print("FeatureList", FeatureList)
-    #print("FeatureValues", FeatureValues)
-    #print("Data", Data)
+    print("FeatureList", FeatureList)
+    print("FeatureValues", FeatureValues)
+    print("Data", Data)
     tree = ID3BuildTree(Data, FeatureList)
     printDTree(tree)
 
