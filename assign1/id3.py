@@ -116,14 +116,16 @@ def entropy(data, feature):
             #if p != 0:
             result += (p * -1.0) * log2(p)
             #print('result' ,result)
+    #print('ENTROPY:', f, result)
     return result
 
 # current entropy - expected entropy after getting info about feature 
 # entropy(data, "Ans") - sum_{v=featurevalues} p_v * entropy(select(data, feature, v), "Ans")
 def gain(data, feature):
     entropy_sum = 0.0
-    for f in FeatureValues[feature]:
+    for f in FeatureValues[feature][0]:
         entropy_sum += entropy(select(data, feature, f), 'Ans')
+        #print(feature, FeatureValues[feature], entropy_sum)
     result = entropy(data, 'Ans') - entropy_sum
     return result
 
@@ -148,6 +150,7 @@ def maxAns(data):
             AnsDict[d['Ans']] = 1
 
     result = max(AnsDict.keys(), key=(lambda k: AnsDict[k]))
+    #print('maxAns', result)
     return result
 
 # this is the ID3 algorithm
@@ -162,7 +165,8 @@ def ID3BuildTree(data, availableFeatures):
 
     # ran out of discriminating features
     if len(availableFeatures) == 0:
-        return [maxAns(data), None]
+        print('***  out of features ***')
+        return [None, maxAns(data)]
 
     # pick maximum information gain
     else :
