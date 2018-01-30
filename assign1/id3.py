@@ -111,13 +111,13 @@ def entropy(data, feature) :
 # entropy(data, "Ans") - sum_{v=featurevalues} p_v * entropy(select(data, feature, v), "Ans")
 def gain(data, feature) :
     #TERRIBLE HACK FIX ME
-    return 0.5
+    return 1
 
 
 # If there one and only one value for the given feature in given data 
 # If not return None
 def isOneLabel(data, feature) :
-    labelSet = set(label for d['Ans'] in data)
+    labelSet = set(d['Ans'] for d in data)
     if len(labelSet) == 1:
         return True
     else:
@@ -125,7 +125,7 @@ def isOneLabel(data, feature) :
 
 # select the most popular Ans value left in the data for the constraints
 # up to now.
-def maxAns(data) :
+def maxAns(data):
     AnsDict = {}
     for d in data:
         if d['Ans'] in AnsDict:
@@ -133,17 +133,18 @@ def maxAns(data) :
         else:
             AnsDict[d['Ans']] = 1
 
-    return max(AnsDict.keys(), key=(lambda k: AnsDict[k]))
+    result = max(AnsDict.keys(), key=(lambda k: AnsDict[k]))
+    return result
 
 # this is the ID3 algorithm
-def ID3BuildTree(data, availableFeatures) :
+def ID3BuildTree(data, availableFeatures):
     # if data is empty
     if len(data) == 0:
         return None
 
     # only one label for the Ans feature at this point?
     if isOneLabel(data, availableFeatures):
-        return data[0]['Ans']
+        return [None, data[0]['Ans']]
 
     # ran out of discriminating features
     if len(availableFeatures) == 0:
@@ -153,7 +154,7 @@ def ID3BuildTree(data, availableFeatures) :
     else :
         bestFeature = None
         bestGain = None
-        for feature in availableFeatures :
+        for feature in availableFeatures:
             g = gain(data, feature)
             print("GAIN: ", feature, ":", round(g, 4));
             if bestGain == None or g>bestGain :
@@ -175,9 +176,12 @@ def ID3BuildTree(data, availableFeatures) :
 
 
 # do the work
-def main() :
+def main():
     readProblem()
     FeatureList.remove("Ans")
+    print("FeatureList", FeatureList)
+    print("FeatureValues", FeatureValues)
+    print("Data", Data)
     tree = ID3BuildTree(Data, FeatureList)
     printDTree(tree)
 
