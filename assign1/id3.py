@@ -89,12 +89,12 @@ def printDTreeAux(indent, tree) :
 
 
 # list of the items in data that have feature equal to value
-def select(data, feature, value) :
+def select(data, feature, value):
     return [ item for item in data if item[feature]==value ]
 
 
 # count how many items in the data have feature equal to value
-def count(data, feature, value) :
+def count(data, feature, value):
     num = 0
     for d in data :
         if d[feature]==value : num+=1
@@ -103,20 +103,20 @@ def count(data, feature, value) :
 
 # what is the entropy of a question about feature?
 # sum the entropy over the possible values of the feature.
-def entropy(data, feature) :
+def entropy(data, feature):
     #TERRIBLE HACK FIX ME
-    return 1
+    return 1.0
 
 # current entropy - expected entropy after getting info about feature 
 # entropy(data, "Ans") - sum_{v=featurevalues} p_v * entropy(select(data, feature, v), "Ans")
-def gain(data, feature) :
+def gain(data, feature):
     #TERRIBLE HACK FIX ME
-    return 1
+    return 1.0
 
 
 # If there one and only one value for the given feature in given data 
 # If not return None
-def isOneLabel(data, feature) :
+def isOneLabel(data, feature):
     labelSet = set(d['Ans'] for d in data)
     if len(labelSet) == 1:
         return True
@@ -134,13 +134,14 @@ def maxAns(data):
             AnsDict[d['Ans']] = 1
 
     result = max(AnsDict.keys(), key=(lambda k: AnsDict[k]))
+    print ('MAXANS', result)
     return result
 
 # this is the ID3 algorithm
 def ID3BuildTree(data, availableFeatures):
     # if data is empty
     if len(data) == 0:
-        return None
+        return [None, 'None']
 
     # only one label for the Ans feature at this point?
     if isOneLabel(data, availableFeatures):
@@ -148,7 +149,7 @@ def ID3BuildTree(data, availableFeatures):
 
     # ran out of discriminating features
     if len(availableFeatures) == 0:
-        return maxAns(data)
+        return [maxAns(data), None]
 
     # pick maximum information gain
     else :
