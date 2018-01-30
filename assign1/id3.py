@@ -107,7 +107,7 @@ def entropy(data, feature):
     #Session 5 Minute 39
     result = 0.0
     for f in FeatureValues['Ans']:
-        if len(data) == 0:
+        if len(data) == 0 or count(data, feature, f) == 0:
             pass
         else:
             #print(count(data, feature, f), '/', len(data))
@@ -122,10 +122,9 @@ def entropy(data, feature):
 # entropy(data, "Ans") - sum_{v=featurevalues} p_v * entropy(select(data, feature, v), "Ans")
 def gain(data, feature):
     entropy_sum = 0.0
-    for f in feature:
+    for f in FeatureValues[feature]:
         entropy_sum += entropy(select(data, feature, f), 'Ans')
     result = entropy(data, 'Ans') - entropy_sum
-    print(result)
     return result
 
 
