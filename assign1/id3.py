@@ -106,8 +106,9 @@ def count(data, feature, value):
 def entropy(data, feature):
     result = 0
     for f in FeatureValues[feature]:
-        p = len(select(data, feature, f)) / len(data)
-        result += calc_entropy(p)
+        if len(data) != 0:
+            p = len(select(data, feature, f)) / len(data)
+            result += calc_entropy(p)
     return result
 
 def calc_entropy(p):
