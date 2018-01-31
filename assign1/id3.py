@@ -126,7 +126,9 @@ def gain(data, feature):
         p = count(data, feature, val) / len(data)
         subset = select(data, feature, val)
         Entropy_S -= p * entropy(subset, 'Ans')
-    return Entropy_S
+    #TODO
+    #May need to round the return value to resolve r.in test issues
+    return round(Entropy_S, 6)
 
 # If there one and only one value for the given feature in given data 
 # If not return None
