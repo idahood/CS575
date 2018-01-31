@@ -104,30 +104,28 @@ def count(data, feature, value):
 # what is the entropy of a question about feature?
 # sum the entropy over the possible values of the feature.
 def entropy(data, feature):
-    #Session 5 Minute 39
-    result = 0.0
-    for f in FeatureValues['Ans']:
-        if len(data) == 0 or count(data, feature, f) == 0:
-            pass
-        else:
-            #print(count(data, feature, f), '/', len(data))
-            p = float(count(data, feature, f)) / len(data)
-            #print('p', p)
-            result += (p * -1.0) * log2(p)
-            #print('result' ,result)
-    #print('ENTROPY:', f, result)
+    result = 0
+    for f in FeatureValues[feature]:
+        p = len(select(data, feature, f)) / len(data)
+        result += calc_entropy(p)
     return result
+
+def calc_entropy(p):
+    if p != 0:
+        return -p * log2(p)
+    else:
+        return 0
 
 # current entropy - expected entropy after getting info about feature 
 # entropy(data, "Ans") - sum_{v=featurevalues} p_v * entropy(select(data, feature, v), "Ans")
 def gain(data, feature):
-    entropy_sum = 0.0
-    for f in FeatureValues[feature][0]:
-        entropy_sum += entropy(select(data, feature, f), 'Ans')
-        #print(feature, FeatureValues[feature], entropy_sum)
-    result = entropy(data, 'Ans') - entropy_sum
-    return result
+    Entropy_S = entropy(data, 'Ans')
 
+    for val in FeatureValues[feature]:
+        p = count(data, feature, val) / len(data)
+        subset = select(data, feature, val)
+        Entropy_S -= p * entropy(subset, 'Ans')
+    return Entropy_S
 
 # If there one and only one value for the given feature in given data 
 # If not return None
@@ -149,7 +147,6 @@ def maxAns(data):
             AnsDict[d['Ans']] = 1
 
     result = max(AnsDict.keys(), key=(lambda k: AnsDict[k]))
-    #print('maxAns', result)
     return result
 
 # this is the ID3 algorithm
@@ -196,9 +193,9 @@ def ID3BuildTree(data, availableFeatures):
 def main():
     readProblem()
     FeatureList.remove("Ans")
-    print("FeatureList", FeatureList)
-    print("FeatureValues", FeatureValues)
-    print("Data", Data)
+    #print("FeatureList", FeatureList)
+    #print("FeatureValues", FeatureValues)
+    #print("Data", Data)
     tree = ID3BuildTree(Data, FeatureList)
     printDTree(tree)
 
