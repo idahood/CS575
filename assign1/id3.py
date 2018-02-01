@@ -203,9 +203,6 @@ def ID3BuildTree(data, availableFeatures):
 def main():
     readProblem()
     FeatureList.remove("Ans")
-    #print("FeatureList", FeatureList)
-    #print("FeatureValues", FeatureValues)
-    #print("Data", Data)
     tree = ID3BuildTree(Data, FeatureList)
     printDTree(tree)
 
