@@ -143,18 +143,16 @@ def isOneLabel(data, feature):
 # up to now.
 def maxAns(data):
     AnsDict = {}
-    AnsList = []
     for d in data:
-        AnsList.append(d['Ans'])
         if d['Ans'] in AnsDict:
             AnsDict[d['Ans']] += 1
         else:
             AnsDict[d['Ans']] = 1
 
     #What if there is a tie?
-    if len(AnsList) == len(set(AnsList)):
+    if len(set(AnsDict.values())) == 1:
         for val in FeatureValues['Ans']:
-            if val in AnsList:
+            if val in AnsDict.keys():
                 return val
 
     else:
