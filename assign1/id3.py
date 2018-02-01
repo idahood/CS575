@@ -143,14 +143,23 @@ def isOneLabel(data, feature):
 # up to now.
 def maxAns(data):
     AnsDict = {}
+    AnsList = []
     for d in data:
+        AnsList.append(d['Ans'])
         if d['Ans'] in AnsDict:
             AnsDict[d['Ans']] += 1
         else:
             AnsDict[d['Ans']] = 1
 
-    result = max(AnsDict.keys(), key=(lambda k: AnsDict[k]))
-    return result
+    #What if there is a tie?
+    if len(AnsList) == len(set(AnsList)):
+        for val in FeatureValues['Ans']:
+            if val in AnsList:
+                return val
+
+    else:
+        result = max(AnsDict.keys(), key=(lambda k: AnsDict[k]))
+        return result
 
 # this is the ID3 algorithm
 def ID3BuildTree(data, availableFeatures):
