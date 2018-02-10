@@ -139,13 +139,11 @@ def gain(data, feature) :
 # If there one and only one value for the given feature in given data 
 # If not return None
 def isOneLabel(data, feature) :
-    target = None
-    for d in data :
-        if target==None :
-            target = d[feature]
-        else :
-            if target != d[feature] : return None
-    return target
+    labelSet = set(d['Ans'] for d in data)
+    if len(labelSet) == 1:
+        return True
+    else:
+        return False
 
 # select the most popular Ans value left in the data for the constraints
 # up to now.
@@ -168,6 +166,10 @@ def maxAns(data) :
 
 # this is the ID3 algorithm
 def ID3BuildTree(data, availableFeatures) :
+    # if data is empty
+    if len(data) == 0:
+        return [None, 'None']
+
     # only one value for the Ans feature at this point?
     if isOneLabel(data, availableFeatures):
         return [None, data[0]['Ans']]
@@ -198,7 +200,9 @@ def ID3BuildTree(data, availableFeatures) :
         availableFeatures = availableFeatures[:]
         availableFeatures.remove(bestFeature)
 
-        #??? something IN this loop to not build a subtree if data is empty for any feature value
+        # ??? something IN this loop to not build a subtree if data is empty for any feature value
+        # TODO: Do I need to move data empty case down?
+
         for v in FeatureValues[bestFeature] :
             treeLeaves[v] = ID3BuildTree(select(data, bestFeature, v), availableFeatures)  # recurse
 
@@ -230,7 +234,8 @@ def printDataLine(features, d) :
         print(f + ":" + d[f], end="   ")
 
 def getAns(tree, d) :
-    #??? Hint: you can test the type of the thing in a variable something like: type(subtrees) is str 
+    # ??? Hint: you can test the type of the thing in a variable something like: type(subtrees) is str 
+    pass
 
 def main() :
     # parse the command line args
