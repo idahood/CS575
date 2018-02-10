@@ -168,7 +168,7 @@ def maxAns(data) :
 def ID3BuildTree(data, availableFeatures) :
     # if data is empty
     if len(data) == 0:
-        return [None, 'None']
+        return [None, maxAns(data)]
 
     # only one value for the Ans feature at this point?
     if isOneLabel(data, availableFeatures):
@@ -235,7 +235,13 @@ def printDataLine(features, d) :
 
 def getAns(tree, d) :
     # ??? Hint: you can test the type of the thing in a variable something like: type(subtrees) is str 
-    pass
+    if tree[0] == 'Ans':
+        return tree[1]
+    else:
+        feature = tree[0]
+        val = d[feature]
+        del d[feature]
+        return getAns(tree[1][val], d)
 
 def main() :
     # parse the command line args
