@@ -1,0 +1,5 @@
+{
+  "test_entropy_gain.py::test_gain_helper": true,
+  "test_id3.py": true,
+  "test_id3.py::test_entropy": true
+}
