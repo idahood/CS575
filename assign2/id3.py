@@ -168,16 +168,16 @@ def maxAns(data) :
 def ID3BuildTree(data, availableFeatures) :
     # if data is empty
     if len(data) == 0:
-        return [None, maxAns(data)]
+        return ['Ans', maxAns(data)]
 
     # only one value for the Ans feature at this point?
     if isOneLabel(data, availableFeatures):
-        return [None, data[0]['Ans']]
+        return ['Ans', data[0]['Ans']]
 
     # ran out of discriminating features
     if len(availableFeatures) == 0:
         print('***  out of features ***')
-        return [None, maxAns(data)]
+        return ['Ans', maxAns(data)]
 
     # pick maximum information gain
     else :
@@ -201,11 +201,11 @@ def ID3BuildTree(data, availableFeatures) :
         availableFeatures.remove(bestFeature)
 
         # ??? something IN this loop to not build a subtree if data is empty for any feature value
-        # TODO: Do I need to move data empty case down?
+        # TODO: Is this an orphaned case?
 
         for v in FeatureValues[bestFeature] :
             if select(data, bestFeature, v) == []:
-                treeLeaves[v] = [None, 'None']
+                treeLeaves[v] = ['Ans', maxAns(data)]
             else:
                 treeLeaves[v] = ID3BuildTree(select(data, bestFeature, v), availableFeatures)  # recurse
 
