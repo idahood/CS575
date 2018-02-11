@@ -204,7 +204,10 @@ def ID3BuildTree(data, availableFeatures) :
         # TODO: Do I need to move data empty case down?
 
         for v in FeatureValues[bestFeature] :
-            treeLeaves[v] = ID3BuildTree(select(data, bestFeature, v), availableFeatures)  # recurse
+            if select(data, bestFeature, v) == []:
+                treeLeaves[v] = [None, 'None']
+            else:
+                treeLeaves[v] = ID3BuildTree(select(data, bestFeature, v), availableFeatures)  # recurse
 
         return [bestFeature, treeLeaves]    # list of best feature and dictionary of trees
 
@@ -234,11 +237,10 @@ def printDataLine(features, d) :
         print(f + ":" + d[f], end="   ")
 
 def getAns(tree, d) :
-    # ??? Hint: you can test the type of the thing in a variable something like: type(subtrees) is str 
-    if tree[0] == 'Ans':
+    feature = tree[0]
+    if feature == 'Ans':
         return tree[1]
     else:
-        feature = tree[0]
         val = d[feature]
         del d[feature]
         return getAns(tree[1][val], d)
