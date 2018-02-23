@@ -13,16 +13,27 @@ std::vector<std::string> split(std::string str){
     return tokens;
 }
 
+double f(double x){
+    if (x > 0.5) {
+        return 1.0;
+    }
+    else {
+        return 0.0;
+    }
+}
+
 int main () {
+    const int MAX_ITER = 5000;
+    const float LEARN_RATE = 0.1;
+    initRand();
+
     std::string line = "";
+    std::vector<std::string> token_line;    
     int inputs = 0;
     int training_rows = 0;
     int training_cols = 0;
-    
     int testing_rows = 0;
     int testing_cols = 0;
-
-    std::vector<std::string> token_line;
 
     //Parse number of inputs
     getline(std::cin, line);
@@ -45,8 +56,6 @@ int main () {
         }
     }
 
-    training.print();
-    
     //Parse testing rows, cols
     getline(std::cin, line);
     token_line = split(line);
@@ -64,5 +73,40 @@ int main () {
         }
     }
 
+    Matrix x;
+    x = training.extract(0, 0, training_rows, inputs);
+    x.setName("x");
+
+    Matrix t;
+    t = training.extract(0, inputs, 0, 0);
+    t.setName("t");
+
+    Matrix w(inputs, training_cols - inputs, "w");
+    w = w.rand(0.0, 1.0);
+
+    for (int i = 0; i < MAX_ITER; i++) {
+        t = training.extract(0, inputs, 0, 0);
+        Matrix y("y");
+        y = x.dot(w);
+        y.setName("y");
+        //y.map(f);
+
+        Matrix error;
+        error = t.sub(y);
+        error.setName("error");
+        //std::cout << "ITER: " << i << std::endl;
+        //error.print();
+
+        Matrix x_t("x tranpose");
+        x_t = x.transpose();
+        w = w.add(x_t.dot(error).scalarMult(LEARN_RATE));
+    }
+
+    Matrix result;
+    result = testing.dot(w);
+    result.map(f);
+    result.setName("result");
     testing.print();
+    w.print();
+    result.print();
 }
