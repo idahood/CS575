@@ -2,7 +2,7 @@ BIN  = nn
 
 CXX=g++
 CC=g++
-SHELL=/bin/sh
+SHELL=/bin/bash
 
 CPPFLAGS= -L /usr/lib/libp/  -pg
 CPPFLAGS=-g -Wall
@@ -42,5 +42,5 @@ clean:
 	/bin/rm -f *.o $(BIN)*.tar *~ core gmon.out a.out
 
 tar: makefile $(SRCS) $(HDRS)
-	tar -cvzf `timename $(BIN)-`.tar makefile $(SRCS) $(HDRS) $(DOCS)
-	ls -l $(BIN)*tar
+	tar -cvzf $(BIN).tar makefile $(SRCS) $(HDRS) $(DOCS)
+	ls -l $(BIN).tar

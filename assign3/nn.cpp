@@ -23,7 +23,7 @@ double f(double x){
 }
 
 int main () {
-    const int MAX_ITER = 5000;
+    const int MAX_ITER = 1000;
     const float LEARN_RATE = 0.01;
     initRand();
 
@@ -73,11 +73,10 @@ int main () {
         }
     }
 
-    //TODO: Should I normalize x and t?
-
     Matrix x;
     x = training.extract(0, 0, training_rows, inputs);
     x.setName("x");
+
     //Normalize x
     double max = x.max();
     x.scalarMult(1.0/max);
@@ -94,13 +93,14 @@ int main () {
         Matrix y("y");
         y = x.dot(w);
         y.setName("y");
-        //y.map(f);
+        y.map(f);
 
         Matrix error;
         error = t.sub(y);
         error.setName("error");
-        //std::cout << "ITER: " << i << std::endl;
-        //error.print();
+
+        std::cout << "ITER: " << i << std::endl;
+        error.print();
 
         Matrix x_t("x tranpose");
         x_t = x.transpose();
@@ -111,7 +111,7 @@ int main () {
     result = testing.dot(w);
     result.map(f);
     result.setName("result");
+    std::cout << "BEGIN TESTING" << std::endl;
     testing.print();
-    w.print();
     result.print();
 }
