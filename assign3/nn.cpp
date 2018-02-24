@@ -24,7 +24,7 @@ double f(double x){
 
 int main () {
     const int MAX_ITER = 5000;
-    const float LEARN_RATE = 0.1;
+    const float LEARN_RATE = 0.01;
     initRand();
 
     std::string line = "";
@@ -73,9 +73,14 @@ int main () {
         }
     }
 
+    //TODO: Should I normalize x and t?
+
     Matrix x;
     x = training.extract(0, 0, training_rows, inputs);
     x.setName("x");
+    //Normalize x
+    double max = x.max();
+    x.scalarMult(1.0/max);
 
     Matrix t;
     t = training.extract(0, inputs, 0, 0);
