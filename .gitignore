@@ -3,6 +3,8 @@
 *.out
 *.tar
 *.tree
+*.swp
+*.pytest*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
