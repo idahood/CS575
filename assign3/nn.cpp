@@ -23,7 +23,7 @@ double f(double x){
 }
 
 int main () {
-    const int MAX_ITER = 1000;
+    const int MAX_ITER = 100;
     const float LEARN_RATE = 0.01;
     initRand();
 
@@ -73,24 +73,32 @@ int main () {
         }
     }
 
+    //Extract sub-matrices from training data
     Matrix x;
     x = training.extract(0, 0, training_rows, inputs);
     x.setName("x");
-
-    //Normalize x
-    double max = x.max();
-    x.scalarMult(1.0/max);
 
     Matrix t;
     t = training.extract(0, inputs, 0, 0);
     t.setName("t");
 
+    //Normalize testing
+    double test_max = testing.max();
+    Matrix norm_testing = testing;
+    norm_testing.scalarMult(1.0/test_max);
+
+    //Normalize x
+    double x_max = x.max();
+    x.scalarMult(1.0/x_max);
+
+    //Initial weights
     Matrix w(inputs, training_cols - inputs, "w");
     w = w.rand(0.0, 1.0);
 
+    //perceptron loop
     for (int i = 0; i < MAX_ITER; i++) {
         t = training.extract(0, inputs, 0, 0);
-        Matrix y("y");
+        Matrix y;
         y = x.dot(w);
         y.setName("y");
         y.map(f);
@@ -99,16 +107,13 @@ int main () {
         error = t.sub(y);
         error.setName("error");
 
-        std::cout << "ITER: " << i << std::endl;
-        error.print();
-
         Matrix x_t("x tranpose");
         x_t = x.transpose();
         w = w.add(x_t.dot(error).scalarMult(LEARN_RATE));
     }
 
     Matrix result;
-    result = testing.dot(w);
+    result = norm_testing.dot(w);
     result.map(f);
     result.setName("result");
     std::cout << "BEGIN TESTING" << std::endl;
