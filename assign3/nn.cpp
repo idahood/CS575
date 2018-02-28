@@ -97,7 +97,7 @@ int main () {
 
     //perceptron loop
     for (int i = 0; i < MAX_ITER; i++) {
-        t = training.extract(0, inputs, 0, 0);
+        t = training.extract(0, inputs, 0, 0); //Have to grab this every time due to desctructive subtraction
         Matrix y;
         y = x.dot(w);
         y.setName("y");
@@ -116,7 +116,11 @@ int main () {
     result = norm_testing.dot(w);
     result.map(f);
     result.setName("result");
+
     std::cout << "BEGIN TESTING" << std::endl;
-    testing.print();
-    result.print();
+    for (int i = 0; i < testing_rows; i++) {
+        testing.writeLine(i);
+        result.writeLine(i);
+        std::cout << std::endl;
+    }
 }
