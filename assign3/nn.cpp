@@ -75,7 +75,7 @@ int main () {
 
     //Extract sub-matrices from training data
     Matrix x;
-    x = training.extract(0, 0, training_rows, inputs);
+    x = training.extract(0, 0, training_rows, inputs + 1);
     x.setName("x");
 
     Matrix t;
@@ -84,15 +84,22 @@ int main () {
 
     //Normalize testing
     double test_max = testing.max();
-    Matrix norm_testing = testing;
-    norm_testing.scalarMult(1.0/test_max);
+    Matrix temp_testing = testing;
+    temp_testing.setName("temp_testing");
+    temp_testing.scalarMult(1.0/test_max);
+    Matrix norm_testing(testing_rows, testing_cols + 1, "norm_testing");
+    norm_testing.constant(-1.0);
+    norm_testing.insert(temp_testing, 0, 0);
 
     //Normalize x
     double x_max = x.max();
     x.scalarMult(1.0/x_max);
+    Matrix bias(training_rows, 1, "bias");
+    bias.constant(-1.0);
+    x.insert(bias, 0, inputs);
 
     //Initial weights
-    Matrix w(inputs, training_cols - inputs, "w");
+    Matrix w(inputs + 1, training_cols - inputs, "w");
     w = w.rand(0.0, 1.0);
 
     //perceptron loop
@@ -109,6 +116,7 @@ int main () {
 
         Matrix x_t("x tranpose");
         x_t = x.transpose();
+        x_t.setName("x transpose");
         w = w.add(x_t.dot(error).scalarMult(LEARN_RATE));
     }
 
