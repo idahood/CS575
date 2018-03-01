@@ -42,5 +42,5 @@ clean:
 	/bin/rm -f *.o $(BIN)*.tar *~ core gmon.out a.out
 
 tar: makefile $(SRCS) $(HDRS)
-	tar -cvzf $(BIN).tar makefile $(SRCS) $(HDRS) $(DOCS)
+	tar -cvf $(BIN).tar makefile $(SRCS) $(HDRS) $(DOCS)
 	ls -l $(BIN).tar
