@@ -13,7 +13,7 @@ double f(double x){
 
 int main () {
     const int MAX_ITER = 100;
-    const float LEARN_RATE = 0.01;
+    const float LEARN_RATE = 0.1;
     initRand();
 
     int inputs = 0;
@@ -71,7 +71,8 @@ int main () {
         Matrix x_t;
         x_t = x.transpose();
         x_t.setName("x transpose");
-        w = w.add(x_t.dot(error).scalarMult(LEARN_RATE));
+
+        w.add(x_t.dot(error).scalarMult(LEARN_RATE));
     }
 
     Matrix result;
