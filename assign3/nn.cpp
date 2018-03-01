@@ -42,8 +42,8 @@ int main () {
     //Parse training rows, cols
     getline(std::cin, line);
     token_line = split(line);
-    training_rows = stoi(token_line[0]);
-    training_cols = stoi(token_line[1]);
+    training_rows = std::stoi(token_line[0]);
+    training_cols = std::stoi(token_line[1]);
 
     //Parse training matrix
     Matrix training(training_rows, training_cols, "training");
@@ -59,8 +59,8 @@ int main () {
     //Parse testing rows, cols
     getline(std::cin, line);
     token_line = split(line);
-    testing_rows = stoi(token_line[0]);
-    testing_cols = stoi(token_line[1]);
+    testing_rows = std::stoi(token_line[0]);
+    testing_cols = std::stoi(token_line[1]);
 
     //Parse testing matrix
     Matrix testing(testing_rows, testing_cols, "testing");

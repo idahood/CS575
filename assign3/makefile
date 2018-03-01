@@ -7,6 +7,7 @@ SHELL=/bin/bash
 CPPFLAGS= -L /usr/lib/libp/  -pg
 CPPFLAGS=-g -Wall
 CPPFLAGS=-O3 -Wall
+CPPFLAGS=-std=c++11
 
 CFLAGS=$(CPPFLAGS)
 LIBS = -lm
