@@ -16,7 +16,7 @@ double step(double x){
 }
 
 int main () {
-    const int MAX_ITER = 100;
+    const int MAX_ITER = 10000;
     const float LEARN_RATE = 0.1;
     const int H_SIZE = 2;
     initRand();
@@ -61,7 +61,7 @@ int main () {
     Matrix v(inputs + 1, H_SIZE, "v");
     v = v.rand(0.0, 1.0);
 
-    Matrix w(H_SIZE + 1, t.numCols(), "w");
+    Matrix w(H_SIZE + 1, training.numCols() - inputs, "w");
     w = w.rand(0.0, 1.0);
 
     //Backprop loop
@@ -72,39 +72,25 @@ int main () {
         h_plus.constant(-1.0);
         h_plus.insert(h, 0, 0);
 
-        //TODO: Destructive subtraction is breaking things
         Matrix y(t.numRows(), training.numCols() - inputs, "y");
         y = h_plus.dot(w).map(f);
-        y.print();
-
-        Matrix y_minus_t = y;
-        y_minus_t.setName("y_minus_t");
-        y_minus_t = y.sub(t);
-        y.print();
-        y_minus_t.print();
-
-        Matrix ones_minus_y(y.numRows(), y.numCols(), "ones_minus_y");
-        ones_minus_y.constant(1.0);
-        ones_minus_y.sub(y);
-        y.print();
-        ones_minus_y.print();
     
+        //Watch your operators here
         Matrix w_delta(training.numRows(), training.numCols() - inputs, "w_delta");
-        w_delta = y_minus_t.mult(y).mult(ones_minus_y);
-
-        Matrix ones_minus_h_plus(h_plus.numRows(), h_plus.numCols(), "ones_minus_h_plus");
-        ones_minus_h_plus.constant(1.0);
-        ones_minus_h_plus.sub(h_plus);
-
-        Matrix w_delta_w_t("w_delta_w_t");
-        w_delta_w_t = w_delta.dotT(w);
+        Matrix y_temp = y;
+        w_delta = y.sub(t).mult(y_temp).mult(y_temp.scalarPreSub(1));
+        y_temp.print();
+        y.print();
 
         Matrix h_delta(training.numRows(), H_SIZE + 1, "h_delta");
-        h_delta = h_plus.mult(ones_minus_h_plus).mult(w_delta_w_t);
+        h_delta = h_plus.mult(h_plus.scalarPreSub(1)).mult(w_delta.dotT(w));
 
         //update w
-        w.sub(h_plus.Tdot(w_delta).scalarMult(LEARN_RATE));
-        
+        Matrix w_temp = h_plus.Tdot(w_delta);
+        w_temp.scalarMult(LEARN_RATE);
+        w = w.sub(w_temp);
+        //w.sub(h_plus.Tdot(w_delta).scalarMult(LEARN_RATE));
+
         //update v
         Matrix h_delta_minus(training.numRows(), H_SIZE, "h_delta_minus");
         h_delta_minus = h_delta.extract(0, 0, training.numRows(), H_SIZE);
@@ -116,9 +102,13 @@ int main () {
         v.print();
     }
 
-    Matrix result;
-    result = testing.dotT(v).dot(w);
-    result.map(f).map(step);
+    Matrix temp_h(testing.numRows(), H_SIZE + 1, "temp_h");
+    temp_h.constant(-1.0);
+    temp_h.insert(norm_testing.dot(v), 0, 0);
+    temp_h.setName("temp_h");
+
+    Matrix result("result");
+    result = temp_h.dot(w).map(f).map(step);
     result.setName("result");
 
     std::cout << "BEGIN TESTING" << std::endl;
