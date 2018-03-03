@@ -71,8 +71,7 @@ int main () {
     }
 
     Matrix result;
-    result = norm_testing.dot(w);
-    result.map(f);
+    result = norm_testing.dot(w).map(f);
     result.setName("result");
 
     std::cout << "BEGIN TESTING" << std::endl;
