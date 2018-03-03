@@ -14,6 +14,7 @@ LIBS = -lm
 
 SRCS=\
 nn.cpp\
+nnoneof.cpp\
 mat.cpp\
 rand.cpp\
 randf.cpp\
@@ -29,6 +30,9 @@ rand.o
 
 nn:	$(OBJS) nn.o
 	$(CC) $(CFLAGS) $(OBJS) nn.o $(LIBS) -o nn
+
+nnoneof:	$(OBJS) nnoneof.o
+	$(CC) $(CFLAGS) $(OBJS) nnoneof.o $(LIBS) -o nnoneof
 
 size:	$(HDRS)  $(SRCS) 
 	wc -l $?
