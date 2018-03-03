@@ -58,21 +58,16 @@ int main () {
 
     //perceptron loop
     for (int i = 0; i < MAX_ITER; i++) {
-        t = training.extract(0, inputs, 0, 0); //Have to grab this every time due to desctructive subtraction
+        t = training.extract(0, inputs, 0, 0); 
         Matrix y;
-        y = x.dot(w);
+        y = x.dot(w).map(f);
         y.setName("y");
-        y.map(f);
 
         Matrix error;
         error = t.sub(y);
         error.setName("error");
 
-        Matrix x_t;
-        x_t = x.transpose();
-        x_t.setName("x transpose");
-
-        w.add(x_t.dot(error).scalarMult(LEARN_RATE));
+        w.add(x.Tdot(error).scalarMult(LEARN_RATE));
     }
 
     Matrix result;
