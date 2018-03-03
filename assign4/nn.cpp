@@ -18,15 +18,16 @@ double step(double x){
 int main () {
     const int MAX_ITER = 10000;
     const float LEARN_RATE = 0.1;
-    int H_SIZE = 2;
     initRand();
 
     int inputs = 0;
+    int H_SIZE = 0;
     Matrix training("training");
     Matrix testing("testing");
 
     //Parse input file
     scanf("%i", &inputs);
+    scanf("%i", &H_SIZE);
     training.read();
     testing.read();
 
@@ -80,6 +81,11 @@ int main () {
         Matrix y(t.numRows(), training.numCols() - inputs, "y");
         y = h_plus.dot(w).map(f);
     
+        if (y.equal(t)) {
+            std::cout << "Training completed early on iter: " << i << std::endl;
+            break;
+        }
+
         //Backprop starts
         //w_delta
         Matrix w_delta(training.numRows(), training.numCols() - inputs, "w_delta");
@@ -89,11 +95,11 @@ int main () {
         y2.setName("y2");
         Matrix y3 = y;
         y3.setName("y3");
-        w_delta = y1.sub(t).mult(y2).mult(y3.scalarPreSub(1));
+        w_delta = y1.sub(t).mult(y2).mult(y3.scalarPreSub(1.0));
 
         //h_delta
         Matrix h_delta = h_plus1;
-        h_delta.mult(h_plus2.scalarPreSub(1));
+        h_delta.mult(h_plus2.scalarPreSub(1.0));
         h_delta.mult(w_delta.dotT(w));
 
         //update w
@@ -103,24 +109,12 @@ int main () {
         Matrix h_delta_minus(training.numRows(), H_SIZE, "h_delta_minus");
         h_delta_minus = h_delta.extract(0, 0, training.numRows(), H_SIZE);
         v.sub(x.Tdot(h_delta_minus).scalarMult(LEARN_RATE));
-
-        //DEBUG
-        /*if (i % 100 == 0) {
-        std::cout << "ITER: " << i << std::endl;
-        h_delta_minus.print();
-        w_delta.print();
-        }*/
     }
 
     Matrix temp_h(testing.numRows(), H_SIZE + 1, "temp_h");
     temp_h.constant(-1.0);
-    temp_h.insert(norm_testing.dot(v), 0, 0);
+    temp_h.insert(norm_testing.dot(v).map(f), 0, 0);
     temp_h.setName("temp_h");
-
-    norm_testing.print();
-    v.print();
-    temp_h.print();
-    w.print();
 
     Matrix result("result");
     result = temp_h.dot(w).map(f);
