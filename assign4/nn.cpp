@@ -81,6 +81,7 @@ int main () {
         Matrix y(t.numRows(), training.numCols() - inputs, "y");
         y = h_plus.dot(w).map(f);
     
+        //Mission Accomplished!
         if (y.equal(t)) {
             std::cout << "Training completed early on iter: " << i << std::endl;
             break;
