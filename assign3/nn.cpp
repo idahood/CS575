@@ -63,6 +63,12 @@ int main () {
         y = x.dot(w).map(f);
         y.setName("y");
 
+        //Mission Accomplished!
+        if (y.equal(t)) {
+            std::cout << "Training completed early on iter: " << i << std::endl;
+            break;
+        }
+
         Matrix error;
         error = t.sub(y);
         error.setName("error");
