@@ -65,7 +65,7 @@ int main () {
 
         //Mission Accomplished!
         if (y.equal(t)) {
-            std::cout << "Training completed early on iter: " << i << std::endl;
+            //std::cout << "Training completed early on iter: " << i << std::endl;
             break;
         }
 

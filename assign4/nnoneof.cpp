@@ -134,7 +134,6 @@ int main () {
     result.map(step);
     result.setName("result");
 
-    std::cout << "BEGIN TESTING" << std::endl;
     for (int i = 0; i < testing.numRows(); i++) {
         testing.writeLine(i);
         std::cout << argmax(result, i);
