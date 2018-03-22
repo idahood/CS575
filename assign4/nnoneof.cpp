@@ -131,7 +131,6 @@ int main () {
 
     Matrix result("result");
     result = temp_h.dot(w).map(f);
-    result.map(step);
     result.setName("result");
 
     for (int i = 0; i < testing.numRows(); i++) {
