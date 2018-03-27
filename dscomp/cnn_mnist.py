@@ -159,6 +159,13 @@ def main(unused_argv):
         steps=20000,
         hooks=[logging_hook])
 
+    # Save the model
+    saver = tf.train.Saver()
+    sess = tf.Session()
+    sess.run(tf.global_variables_initializer())
+    saver.save(sess, 'dodd_cnn_dscomp')
+
+    '''
     # Evaluate the model and print results
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": eval_data},
@@ -167,6 +174,7 @@ def main(unused_argv):
         shuffle=False)
     eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
     print(eval_results)
+    '''
 
 if __name__ == "__main__":
     tf.app.run()

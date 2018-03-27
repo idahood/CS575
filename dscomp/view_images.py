@@ -59,9 +59,10 @@ def main():
     test_data = pd.read_csv('test.csv', index_col=0,
                             header=0).as_matrix().astype(dtype=np.float32)
 
-    split_images = test_splitter(test_data[0], 5)
+    split_images = test_splitter(test_data[3], 5)
     for image in split_images:
         image = image.reshape([24, 24])
+        image = f(image)    #REDUCE NOISE DUE TO "ERASED" LAYER
         plt.imshow(image, cmap=plt.get_cmap('gray_r'))
         plt.show()
 
