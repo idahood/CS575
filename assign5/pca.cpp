@@ -7,8 +7,8 @@ Matrix center(Matrix &original) {
     //TODO: Should I transpose here? Rows vs Columns in 1.1 of handout
     
     for (int c = 0; c < result.numCols(); c++) {
-        double mean_x = original.meanCol(c);
-        double stddev_x = original.stddevCol(c);
+        double mean_x = result.meanCol(c);
+        double stddev_x = result.stddevCol(c);
         for (int r = 0; r < result.numRows(); r++) {
             double val = result.get(r, c);
             result.set(r, c, (val - mean_x)/stddev_x);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     // Sort eigenvectors by eigenvalue
     // eigenSystem() call returns pairs sorted in decreasing magnitude
-    Matrix V_hat = V.extract(0, 0, k, 0);
+    Matrix V_hat = V.extract(0, 0, 0, k);
     std::cout << "V_hat ";
     V_hat.printSize();
 
