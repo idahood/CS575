@@ -3,7 +3,7 @@
 #include "rand.h"
 
 Matrix center(Matrix &original) {
-    Matrix result = original.transpose();
+    Matrix result = original;
     //TODO: Should I transpose here? Rows vs Columns in 1.1 of handout
     
     for (int c = 0; c < result.numCols(); c++) {
@@ -15,7 +15,22 @@ Matrix center(Matrix &original) {
         }
     }
 
-    return result.transpose();
+    return result;
+}
+
+Matrix uncompress(const Matrix &compressed, Matrix &original) {
+    Matrix result = compressed;
+
+    for (int c = 0; c < result.numCols(); c++) {
+        double mean_x = original.meanCol(c);
+        double stddev_x = original.stddevCol(c);
+        for (int r = 0; r < result.numRows(); r++) {
+            double val = result.get(r, c);
+            result.set(r, c, (val * stddev_x) + mean_x);
+        }
+    }
+
+    return result;
 }
 
 int main(int argc, char *argv[]) {
@@ -23,7 +38,7 @@ int main(int argc, char *argv[]) {
     int k = atoi(argv[2]);
 
     Matrix image;
-    image.readImagePgm(filename, "image");
+    image.readImagePpm(filename, "image");
 
     // Center the data
     Matrix X_prime = center(image);
@@ -55,7 +70,7 @@ int main(int argc, char *argv[]) {
 
     // Sort eigenvectors by eigenvalue
     // eigenSystem() call returns pairs sorted in decreasing magnitude
-    Matrix V_hat = V.extract(0, 0, 0, k);
+    Matrix V_hat = V.extract(0, 0, k, 0);
     std::cout << "V_hat ";
     V_hat.printSize();
 
@@ -64,4 +79,15 @@ int main(int argc, char *argv[]) {
     std::cout << "X_dbl_prime ";
     X_dbl_prime.printSize();
 
+    // Recovering data from compressed data
+    Matrix X_star = X_dbl_prime.dot(V_hat);
+    X_star = uncompress(X_star, image);
+    std::cout << "X_star ";
+    X_star.printSize();
+
+    // Calculate difference between original and reconstituted image
+    std::cout << image.dist2(X_star) << std::endl;
+
+    // Save reconstitued image
+    X_star.writeImagePpm("z-after.ppm", "Reconstituted Image");
 }
