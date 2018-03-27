@@ -33,12 +33,41 @@ Matrix uncompress(const Matrix &compressed, Matrix &original) {
     return result;
 }
 
+Matrix parser(std::string filename) {
+    Matrix result;
+
+    if (filename.compare(filename.size() - 3, 3, "ppm") == 0) {
+        result.readImagePpm(filename, "image");
+    }
+    else if (filename.compare(filename.size() - 3, 3, "pgm") == 0) {
+        result.readImagePgm(filename, "image");
+    }
+    else {
+        std::cerr << filename << " unsupported filetype" << std::endl;
+        exit(1);
+    }
+
+    return result;
+}
+
+void putter(std::string filename, Matrix &output) {
+    if (filename.compare(filename.size() - 3, 3, "ppm") == 0) {
+        output.writeImagePpm("z-after.ppm", "Reconstituted Image");
+    }
+    else if (filename.compare(filename.size() - 3, 3, "pgm") == 0) {
+        output.writeImagePgm("z-after.pgm", "Reconstituted Image");
+    }
+    else {
+        std::cerr << filename << " unsupported filetype" << std::endl;
+        exit(1);
+    }
+}
+
 int main(int argc, char *argv[]) {
-    char* filename = argv[1];
+    std::string filename = argv[1];
     int k = atoi(argv[2]);
 
-    Matrix image;
-    image.readImagePpm(filename, "image");
+    Matrix image = parser(filename);
 
     // Center the data
     Matrix X_prime = center(image);
@@ -89,5 +118,5 @@ int main(int argc, char *argv[]) {
     std::cout << image.dist2(X_star) << std::endl;
 
     // Save reconstitued image
-    X_star.writeImagePpm("z-after.ppm", "Reconstituted Image");
+    putter(filename, X_star);
 }
