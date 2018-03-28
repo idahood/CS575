@@ -4,8 +4,9 @@
 
 Matrix center(Matrix &original) {
     Matrix result = original;
-    //TODO: Should I transpose here? Rows vs Columns in 1.1 of handout
-    
+    // TODO: Should I transpose here? Rows vs Columns in 1.1 of handout
+    // After testing the resulting images look better w/out the double transpose
+
     for (int c = 0; c < result.numCols(); c++) {
         double mean_x = result.meanCol(c);
         double stddev_x = result.stddevCol(c);
@@ -90,6 +91,8 @@ int main(int argc, char *argv[]) {
     W.printSize();
     std::cout << "V ";
     V.printSize();
+    std::cout << "Transpose of W" << std::endl;
+    W.transpose().print();
 
     // Normalize the eigenvectors
     Matrix V_prime = V;
@@ -115,7 +118,9 @@ int main(int argc, char *argv[]) {
     X_star.printSize();
 
     // Calculate difference between original and reconstituted image
-    std::cout << image.dist2(X_star) << std::endl;
+    // TODO: May need to divide dist2 return value by number of elements in
+    // X_star?
+    std::cout << "Difference between original and reconstituted image: " << image.dist2(X_star) << std::endl;
 
     // Save reconstitued image
     putter(filename, X_star);
