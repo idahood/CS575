@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import time
-from view_images import test_splitter
+from view_images import expression_to_character
 
 #tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -135,9 +135,7 @@ def main(unused_argv):
                               header=0).as_matrix()
     predict_set = pd.read_csv('test.csv', index_col=0,
                            header=0).as_matrix().astype(dtype=np.float32)
-    test_data = []
-    for item in predict_set:
-        test_data.append(test_splitter(item, 5))
+    test_data = expression_to_character(predict_set)
 
     SPLIT = 10000
     train_data = data_set[:SPLIT, :]
@@ -184,37 +182,25 @@ def main(unused_argv):
     print(eval_results)
 
     print("*** PREDICTING ***")
-    test_line = []
-    t0 = time.time()
-    for (idx, test_data_line) in enumerate(test_data, 1):
-        if idx % 10 == 0:
-            t1 = time.time()
-            t_delta = t1 - t0
-            t0 = t1
-            print(idx, t_delta)
-        if idx == 20:
-            break
-
-        line = []
-        for test_data_itr in test_data_line:
-            predict_input_fn = tf.estimator.inputs.numpy_input_fn(
-                x={"x": test_data_itr},
-                num_epochs=1,
-                shuffle=False)
-            predict_results = mnist_classifier.predict(input_fn=predict_input_fn)
-            #print("*** PREDICTION ***")
-            for i in predict_results:
-                line.append(i['classes'])
-        test_line.append(line)
+    predict_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x={"x": test_data},
+        num_epochs=1,
+        shuffle=False)
+    predict_results = mnist_classifier.predict(input_fn=predict_input_fn)
 
     rosetta = { 0:0, 1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9, 10:'+',
                11:'-', 12:'=' }
 
-    for line in test_line:
-        temp = []
-        for i in line:
-            temp.append(rosetta[i])
-        print(temp)
+    line = []
+    output = []
+    for (counter, pr) in enumerate(predict_results, start=0):
+        line += str(rosetta[pr['classes']])
+        if len(line) == 5:
+            output.append(line)
+            line = []
+
+    expression_nda = np.array(output)
+    np.save('expressions.npy', expression_nda)
 
 if __name__ == "__main__":
     tf.app.run()

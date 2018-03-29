@@ -49,6 +49,20 @@ def test_splitter(line, NUM_SPLITS):
         result.append(line[0:24, i*STEP:(i+1)*STEP])
     return result
 
+def expression_to_character(data):
+    '''
+    Takes ndarray, and return resized ndarray
+    '''
+
+    result = []
+    for line in data:
+        expression = line.reshape([24, 120])
+        STEP = 24
+        for i in range (0, 5):
+            character = expression[0:24, i*STEP:(i+1)*STEP].reshape(1,576)
+            result.append(character)
+    return np.array(result)
+
 def main():
     #train_data = pd.read_csv('train.csv', index_col=0,
     #                         header=0).as_matrix().astype(dtype=np.float32)
@@ -66,16 +80,6 @@ def main():
         plt.imshow(image, cmap=plt.get_cmap('gray_r'))
         plt.show()
     '''
-    massaged_test_data = []
-    #massaged_test_data = np.empty((0,576), dtype=np.float32) #HOW DO I INIT THIS TO BE 1x576!!
-    for (counter, line) in enumerate(test_data):
-        line = line.reshape([24, 120])
-        STEP = 24
-        for i in range (0, 5):
-            temp = line[0:24, i*STEP:(i+1)*STEP].reshape(1,576)
-            massaged_test_data.append(temp)
-    test = np.array(massaged_test_data)
-    print(test.shape)
 
 if __name__ == '__main__':
     main()
