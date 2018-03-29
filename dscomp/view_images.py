@@ -58,13 +58,24 @@ def main():
     test_data = pd.read_csv('test.csv', index_col=0,
                             header=0).as_matrix().astype(dtype=np.float32)
 
+    '''
     split_images = test_splitter(test_data[19999], 5)
     for image in split_images:
         image = image.reshape([24, 24])
-        #image = f(image)    #REDUCE NOISE DUE TO "ERASED" LAYER
+        image = f(image)    #REDUCE NOISE DUE TO "ERASED" LAYER
         plt.imshow(image, cmap=plt.get_cmap('gray_r'))
         plt.show()
-
+    '''
+    massaged_test_data = []
+    #massaged_test_data = np.empty((0,576), dtype=np.float32) #HOW DO I INIT THIS TO BE 1x576!!
+    for (counter, line) in enumerate(test_data):
+        line = line.reshape([24, 120])
+        STEP = 24
+        for i in range (0, 5):
+            temp = line[0:24, i*STEP:(i+1)*STEP].reshape(1,576)
+            massaged_test_data.append(temp)
+    test = np.array(massaged_test_data)
+    print(test.shape)
 
 if __name__ == '__main__':
     main()
