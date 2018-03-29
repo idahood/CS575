@@ -23,8 +23,10 @@ from __future__ import print_function
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import time
+from view_images import test_splitter
 
-tf.logging.set_verbosity(tf.logging.INFO)
+#tf.logging.set_verbosity(tf.logging.INFO)
 
 
 def cnn_model_fn(features, labels, mode):
@@ -113,8 +115,7 @@ def cnn_model_fn(features, labels, mode):
       return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 
     # Add evaluation metrics (for EVAL mode)
-    eval_metric_ops = {
-        "accuracy": tf.metrics.accuracy(
+    eval_metric_ops = {"accuracy": tf.metrics.accuracy(
             labels=labels, predictions=predictions["classes"])}
     return tf.estimator.EstimatorSpec(
         mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
@@ -128,24 +129,32 @@ def main(unused_argv):
     #eval_data = mnist.test.images  # Returns np.array
     #eval_labels = np.asarray(mnist.test.labels, dtype=np.int32)
 
-    train_data = pd.read_csv('train.csv', index_col=0,
-                             header=0).as_matrix().astype(dtype=np.float32)
-    train_labels = pd.read_csv('train_labels.csv', index_col=0,
+    data_set = pd.read_csv('train.csv', index_col=0,
+                           header=0).as_matrix().astype(dtype=np.float32)
+    label_set = pd.read_csv('train_labels.csv', index_col=0,
                               header=0).as_matrix()
+    predict_set = pd.read_csv('test.csv', index_col=0,
+                           header=0).as_matrix().astype(dtype=np.float32)
+    test_data = []
+    for item in predict_set:
+        test_data.append(test_splitter(item, 5))
 
-    eval_data = train_data
-    eval_labels = train_labels
+    SPLIT = 10000
+    train_data = data_set[:SPLIT, :]
+    train_labels = label_set[:SPLIT, :]
+    eval_data = data_set[SPLIT:, :]
+    eval_labels = label_set[SPLIT:, :]
 
     # Create the Estimator
     mnist_classifier = tf.estimator.Estimator(
-        model_fn=cnn_model_fn, model_dir="/tmp/mnist_convnet_model")
+        model_fn=cnn_model_fn, model_dir="./dodd_dscomp")
 
     # Set up logging for predictions
     # Log the values in the "Softmax" tensor with label "probabilities"
     tensors_to_log = {"probabilities": "softmax_tensor"}
     logging_hook = tf.train.LoggingTensorHook(
         tensors=tensors_to_log, every_n_iter=50)
-
+    '''
     # Train the model
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
@@ -156,16 +165,15 @@ def main(unused_argv):
 
     mnist_classifier.train(
         input_fn=train_input_fn,
-        steps=20000,
+        steps=5000,
         hooks=[logging_hook])
-
-    # Save the model
-    saver = tf.train.Saver()
-    sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
-    saver.save(sess, 'dodd_cnn_dscomp')
-
     '''
+    # TODO: classifier.evaluate() vs. classifier.predict()
+    # What is the difference?
+    # A: Training set, Validation set, Test set
+    # evaluate => validation
+    # predict => test (unlabeled)
+
     # Evaluate the model and print results
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": eval_data},
@@ -174,7 +182,39 @@ def main(unused_argv):
         shuffle=False)
     eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
     print(eval_results)
-    '''
+
+    print("*** PREDICTING ***")
+    test_line = []
+    t0 = time.time()
+    for (idx, test_data_line) in enumerate(test_data, 1):
+        if idx % 10 == 0:
+            t1 = time.time()
+            t_delta = t1 - t0
+            t0 = t1
+            print(idx, t_delta)
+        if idx == 20:
+            break
+
+        line = []
+        for test_data_itr in test_data_line:
+            predict_input_fn = tf.estimator.inputs.numpy_input_fn(
+                x={"x": test_data_itr},
+                num_epochs=1,
+                shuffle=False)
+            predict_results = mnist_classifier.predict(input_fn=predict_input_fn)
+            #print("*** PREDICTION ***")
+            for i in predict_results:
+                line.append(i['classes'])
+        test_line.append(line)
+
+    rosetta = { 0:0, 1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9, 10:'+',
+               11:'-', 12:'=' }
+
+    for line in test_line:
+        temp = []
+        for i in line:
+            temp.append(rosetta[i])
+        print(temp)
 
 if __name__ == "__main__":
     tf.app.run()
