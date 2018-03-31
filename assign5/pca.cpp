@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     int k;
     scanf("%i", &k);
 
-    Matrix image;
+    Matrix image("Pic");
     image.readImagePpm("", "Pic");
     image.printSize();
 
