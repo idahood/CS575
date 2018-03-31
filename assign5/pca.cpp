@@ -65,63 +65,55 @@ void putter(std::string filename, Matrix &output) {
 }
 
 int main(int argc, char *argv[]) {
-    std::string filename = argv[1];
-    int k = atoi(argv[2]);
+    //std::string filename = argv[1];
+    //int k = atoi(argv[2]);
 
-    Matrix image = parser(filename);
+    //Parse input file
+    int k;
+    scanf("%i", &k);
+
+    Matrix image;
+    image.readImagePpm("", "Pic");
+    image.printSize();
 
     // Center the data
     Matrix X_prime = center(image);
     Matrix X_prime_1 = X_prime;
     Matrix X_prime_2 = X_prime;
-    std::cout << "X_prime ";
-    X_prime.printSize();
 
     // Compute covariance matrix
     Matrix M;
     M = X_prime_1.transpose().scalarMult(1.0 / image.numRows()).dot(X_prime_2);
-    std::cout << "M ";
-    M.printSize();
 
     // Compute eigenvalues(W) and eigenvectors(V) of M
     Matrix V = M;
-    Matrix W;
+    Matrix W("EigenValues");
     W = V.eigenSystem();
-    std::cout << "W ";
     W.printSize();
-    std::cout << "V ";
-    V.printSize();
-    std::cout << "Transpose of W" << std::endl;
-    W.transpose().print();
 
     // Normalize the eigenvectors
     Matrix V_prime = V;
     V_prime.scalarMult(1.0 / (V.max() - V.min()));
-    std::cout << "V_prime ";
-    V_prime.printSize();
 
     // Sort eigenvectors by eigenvalue
     // eigenSystem() call returns pairs sorted in decreasing magnitude
     Matrix V_hat = V.extract(0, 0, k, 0);
-    std::cout << "V_hat ";
-    V_hat.printSize();
 
     // Translate the normalized data
     Matrix X_dbl_prime = X_prime.dotT(V_hat);
-    std::cout << "X_dbl_prime ";
+    X_dbl_prime.setName("Encoded");
     X_dbl_prime.printSize();
 
     // Recovering data from compressed data
     Matrix X_star = X_dbl_prime.dot(V_hat);
     X_star = uncompress(X_star, image);
-    std::cout << "X_star ";
-    X_star.printSize();
 
     // Calculate difference between original and reconstituted image
     // TODO: May need to divide dist2 return value by number of elements in
     // X_star?
-    std::cout << "Difference between original and reconstituted image: " << image.dist2(X_star) << std::endl;
+    std::cout << "DIST: " << image.dist2(X_star) / (X_star.numRows() * X_star.numCols()) << std::endl;
 
     // Save reconstitued image
-    putter(filename, X_star);
+    //putter(filename, X_star);
+    X_star.writeImagePpm("z-after.ppm", "Reconstituted Image");
 }
