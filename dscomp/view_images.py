@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-def f(x):
+def reduce_noise(x):
     return np.where(x < 0.4, 0.0, x)
 
 def display_train_digit(idx, data, label, x_dim, y_dim):
@@ -76,7 +76,7 @@ def main():
     split_images = test_splitter(test_data[19999], 5)
     for image in split_images:
         image = image.reshape([24, 24])
-        image = f(image)    #REDUCE NOISE DUE TO "ERASED" LAYER
+        image = reduce_noise(image)    #REDUCE NOISE DUE TO "ERASED" LAYER
         plt.imshow(image, cmap=plt.get_cmap('gray_r'))
         plt.show()
     '''

@@ -23,11 +23,22 @@ from __future__ import print_function
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import re
 import time
-from view_images import expression_to_character
+import view_images
+from random import randint
 
 #tf.logging.set_verbosity(tf.logging.INFO)
 
+def check_form(expression):
+    if len(expression) != 5:
+        return False
+
+    p = re.compile('[0-9][\+|\-|\=][0-9][\+|\-|\=][0-9]')
+    if p.match(expression):
+        return True
+    else:
+        return False
 
 def cnn_model_fn(features, labels, mode):
     """Model function for CNN."""
@@ -135,7 +146,8 @@ def main(unused_argv):
                               header=0).as_matrix()
     predict_set = pd.read_csv('test.csv', index_col=0,
                            header=0).as_matrix().astype(dtype=np.float32)
-    test_data = expression_to_character(predict_set)
+    test_data = view_images.expression_to_character(predict_set)
+    #test_data = view_images.reduce_noise(test_data)
 
     SPLIT = 10000
     train_data = data_set[:SPLIT, :]
@@ -152,7 +164,7 @@ def main(unused_argv):
     tensors_to_log = {"probabilities": "softmax_tensor"}
     logging_hook = tf.train.LoggingTensorHook(
         tensors=tensors_to_log, every_n_iter=50)
-    '''
+
     # Train the model
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": train_data},
@@ -163,9 +175,9 @@ def main(unused_argv):
 
     mnist_classifier.train(
         input_fn=train_input_fn,
-        steps=5000,
+        steps=10000,
         hooks=[logging_hook])
-    '''
+
     # TODO: classifier.evaluate() vs. classifier.predict()
     # What is the difference?
     # A: Training set, Validation set, Test set
@@ -181,6 +193,7 @@ def main(unused_argv):
     eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
     print(eval_results)
 
+    # Use model to predict on unlabeled data
     print("*** PREDICTING ***")
     predict_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": test_data},
@@ -200,7 +213,27 @@ def main(unused_argv):
             line = []
 
     expression_nda = np.array(output)
-    np.save('expressions.npy', expression_nda)
+    #np.save('expressions.npy', expression_nda)
+
+    bad_form = 0
+    with open('output.csv', 'w') as f:
+        print('index', 'label', 'expression', file=f, sep=',')
+        for (idx, item) in enumerate(expression_nda):
+            item = ''.join(item)
+            if check_form(item):
+                (lhs, rhs) = item.split('=')
+                if eval(lhs) == eval(rhs):
+                    #print(idx, 1, item, file=f, sep=',')
+                    print(idx, 1, file=f, sep=',')
+                else:
+                    #print(idx, 0, item, file=f, sep=',')
+                    print(idx, 0, file=f, sep=',')
+            else:
+                #print(idx, '*', item, file=f, sep=',')
+                bad_form += 1
+                print(idx, 0, file=f, sep=',') #Malformed expressions are "wrong"
+    f.close()
+    print('Malformed expressions: ', bad_form)
 
 if __name__ == "__main__":
     tf.app.run()
