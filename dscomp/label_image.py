@@ -101,28 +101,33 @@ if __name__ == "__main__":
     if args.output_layer:
       output_layer = args.output_layer
 
-    for i in range(0, 5):
-        file_name = './test/' + str(i) + '.png'
-        graph = load_graph(model_file)
-        t = read_tensor_from_image_file(
-            file_name,
-            input_height=299,
-            input_width=299,
-            input_mean=0,
-            input_std=255)
+    with open('expressions', 'w') as f:
+        line = ''
+        for i in range(0, 100000):
+            file_name = './test/' + str(i) + '.png'
+            graph = load_graph(model_file)
+            t = read_tensor_from_image_file(
+                file_name,
+                input_height=299,
+                input_width=299,
+                input_mean=0,
+                input_std=255)
 
-        input_name = "import/" + input_layer
-        output_name = "import/" + output_layer
-        input_operation = graph.get_operation_by_name(input_name)
-        output_operation = graph.get_operation_by_name(output_name)
+            input_name = "import/" + input_layer
+            output_name = "import/" + output_layer
+            input_operation = graph.get_operation_by_name(input_name)
+            output_operation = graph.get_operation_by_name(output_name)
 
-        with tf.Session(graph=graph) as sess:
-          results = sess.run(output_operation.outputs[0], {
-              input_operation.outputs[0]: t
-          })
-        results = np.squeeze(results)
+            with tf.Session(graph=graph) as sess:
+              results = sess.run(output_operation.outputs[0], {
+                  input_operation.outputs[0]: t
+              })
+            results = np.squeeze(results)
 
-        top_k = results.argsort()[-1:][::-1]
-        labels = load_labels(label_file)
-        for i in top_k:
-          print(labels[i])
+            top_k = results.argsort()[-1:][::-1]
+            labels = load_labels(label_file)
+            for i in top_k:
+              line += labels[i]
+            if len(line) == 5:
+                print (line, file=f)
+                line = ''
