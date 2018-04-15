@@ -2,25 +2,33 @@
 #include "mat.h"
 #include "rand.h"
 
-void build_kdtree(Matrix &original, int start, int end, int col) {
+void build_kdtree(Matrix &original, int start, int end, int col, char **labels) {
+    int pivot = (end + start) / 2;
     original.sortRowsByCol(col, start, end);
-    int split = (start + end) / 2;
-    std::cout << split << std::endl;
-    if (col == original.numCols() - 1) {
+
+    if (end - start == 1) {
+        return;
+    }
+    else if (end - start == 2) {
+        original.sortRowsByCol(col, start, end);
         return;
     }
     else {
-        build_kdtree(original, start, split, col + 1);
-        build_kdtree(original, split, end, col + 1);
+        col = (col % (original.numCols() - 1)) + 1;
+        //What if pivot - 1 is out of bounds?
+        build_kdtree(original, start, pivot - 1, col, labels);
+        build_kdtree(original, pivot + 1, end, col, labels);
     }
 }
 
 int main(int argc, char *argv[]) {
     //Parse input file
-    Matrix x("x");
+    Matrix x("kd tree");
     char **labels;
     labels = x.readLabeledRow();
 
-    build_kdtree(x, 0, x.numRows() - 1, 1);
-    x.print();
+    //Recursively build a KD-Tree
+    build_kdtree(x, 0, x.numRows() - 1, 1, labels);
+
+    x.printLabeledRow(labels);
 }
