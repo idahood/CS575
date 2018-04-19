@@ -24,7 +24,6 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
 
     std::cout << "RANGE: " << start << "  to  " << end << std::endl;
 
-    std::cout << candidate_best << " " << best << std::endl;
     //single row (leaf)
     if (end == start) {
         int idx = start;
@@ -41,7 +40,6 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
 
     //parent cases
     else {
-        std::cout << "HIT0" << std::endl;
         int parent_idx = pivot;
         int child1_idx = (start + pivot - 1) / 2;
         int child2_idx = (pivot + 1 + end) / 2;
@@ -51,10 +49,8 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
 
         //Try lower half
         if (item.get(0, col) <= parent.get(0, col)) {
-            std::cout << "HIT1" << std::endl;
             //try first child if it is there
             if (pivot - start > 0) {
-                std::cout << "HIT2" << std::endl;
                 bestex = nearest(tree, start, pivot - 1,
                         (col + 1) % tree.numCols(), item, best);
                 if (abs(item.get(0, col) - parent.get(0, col)) > best) {
@@ -62,11 +58,9 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
                 }
             }
 
-            std::cout << "HIT3" << std::endl;
             //try parent
             candidate_best = sqrt(item.dist2(parent));
             if (candidate_best < best) {
-                std::cout << "HIT4" << std::endl;
                 best = candidate_best;
                 bestex = parent_idx;
                 if (best == 0) {
@@ -79,7 +73,6 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
 
             //try second child if it is there
             if (end - pivot > 0) {
-                std::cout << "HIT5" << std::endl;
                 bestex = nearest(tree, pivot + 1, end, 
                         (col + 1) % tree.numCols(), item, best);
                 if (abs(item.get(0, col) - child2.get(0, col)) > best) {
@@ -92,7 +85,7 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
         else {
             //try second child if it is there
             if (end - pivot > 0) {
-                bestex = nearest(tree, pivot - 1, end, 
+                bestex = nearest(tree, pivot + 1, end, 
                         (col + 1) % tree.numCols(), item, best);
                 if (abs(item.get(0, col) - parent.get(0, col)) > best) {
                     return bestex;
@@ -141,6 +134,7 @@ int main(int argc, char *argv[]) {
     //Recursively build a K-D Tree
     build_kdtree(x, 0, x.numRows() - 1, 1);
 
+    std::cout << "KDTree version of matrix";
     x.printLabeledRow(labels);
 
     Matrix unlabeled = x.subMatrix(0, 1, 0, 0);
