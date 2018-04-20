@@ -3,6 +3,9 @@
 #include "mat.h"
 #include "rand.h"
 
+float best = 2147483647;
+int bestex = -1;
+
 void build_kdtree(Matrix &original, int start, int end, int col) {
     int pivot = (end + start) / 2;
     original.sortRowsByCol(col, start, end);
@@ -17,10 +20,19 @@ void build_kdtree(Matrix &original, int start, int end, int col) {
     }
 }
 
-int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float best) {
+void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
     int pivot = (end + start) / 2;
-    int bestex;
+    int parent_idx = pivot;
+    int child1_idx = (start + pivot - 1) / 2;
+    int child2_idx = (pivot + 1 + end) / 2;
+    Matrix parent = tree.subMatrix(parent_idx, 0, 1, 0);
+    Matrix child1 = tree.subMatrix(child1_idx, 0, 1, 0);
+    Matrix child2 = tree.subMatrix(child2_idx, 0, 1, 0);
     float candidate_best;
+
+    if (abs(item.get(0, col) - parent.get(0, col)) > best) {
+        return;
+    }
 
     std::cout << "RANGE: " << start << "  to  " << end << std::endl;
 
@@ -29,14 +41,13 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
         int idx = start;
         Matrix leaf = tree.subMatrix(idx, 0, 1, 0);
         candidate_best = sqrt(item.dist2(leaf));
-        std::cout << candidate_best << " " << best << std::endl;
         if (candidate_best < best) {
             best = candidate_best;
             bestex = idx;
             std::cout << "BESTLEAF: " << std::setprecision(3) << 
                 std::fixed << best << " " << bestex << std::endl;
         }
-        return bestex;
+        return;
     }
 
     //parent cases
@@ -50,21 +61,17 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
 
         //Try lower half
         if (item.get(0, col) <= parent.get(0, col)) {
-            std::cout << "LOWER" << std::endl;
             //try first child if it is there
             if (pivot - start > 0) {
-                std::cout << "FIRST CHILD" << std::endl;
-                bestex = nearest(tree, start, pivot - 1,
-                        (col + 1) % tree.numCols(), item, best);
+                nearest(tree, start, pivot - 1,
+                        (col + 1) % tree.numCols(), item);
                 if (abs(item.get(0, col) - parent.get(0, col)) > best) {
-                    std::cout << "PRUNE" << std::endl;
-                    return bestex;
+                    return;
                 }
             }
 
             //try parent
             candidate_best = sqrt(item.dist2(parent));
-            std::cout << candidate_best << " " << best << std::endl;
             if (candidate_best < best) {
                 best = candidate_best;
                 bestex = parent_idx;
@@ -72,15 +79,14 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
                     << std::fixed << best << " " 
                     << bestex << std::endl;
                 if (best == 0) {
-                    return bestex;
+                    return;
                 }
             }
 
             //try second child if it is there
             if (end - pivot > 0) {
-                std::cout << "SECOND CHILD" << std::endl;
-                bestex = nearest(tree, pivot + 1, end, 
-                        (col + 1) % tree.numCols(), item, best);
+                nearest(tree, pivot + 1, end, 
+                        (col + 1) % tree.numCols(), item);
             }
         }
 
@@ -89,12 +95,10 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
             std::cout << "UPPER" << std::endl;
             //try second child if it is there
             if (end - pivot > 0) {
-                std::cout << "SECOND CHILD" << std::endl;
-                bestex = nearest(tree, pivot + 1, end, 
-                        (col + 1) % tree.numCols(), item, best);
+                nearest(tree, pivot + 1, end, 
+                        (col + 1) % tree.numCols(), item);
                 if (abs(item.get(0, col) - parent.get(0, col)) > best) {
-                    std::cout << "PRUNE" << std::endl;
-                    return bestex;
+                    return;
                 }
             }
 
@@ -107,18 +111,17 @@ int nearest(const Matrix &tree, int start, int end, int col, Matrix &item, float
                     << std::fixed << best << " " 
                     << bestex << std::endl;
                 if (best == 0) {
-                    return bestex;
+                    return;
                 }
             }
 
             //try first child if it is there
             if (pivot - start > 0) {
-                std::cout << "FIRST CHILD" << std::endl;
-                bestex = nearest(tree, start, pivot - 1, 
-                        (col + 1) % tree.numCols(), item, best);
+                nearest(tree, start, pivot - 1, 
+                        (col + 1) % tree.numCols(), item);
             }
         }
-        return bestex;
+        return;
     }
     std::cout << "ERROR: Should not hit here. Thanos wins." << std::endl;
     exit(1);
@@ -147,9 +150,11 @@ int main(int argc, char *argv[]) {
         std::cout<< std::endl;
         Matrix row("row");
         row = eval.subMatrix(r, 0, 1, 0);
-        int idx = nearest(unlabeled, 0, unlabeled.numRows() - 1, 1, row, 2147483647);
+        best = 2147483647;
+        bestex = -1;
+        nearest(unlabeled, 0, unlabeled.numRows() - 1, 1, row);
         std::cout << "Ans:";
-        unlabeled.writeLine(idx);
-        std::cout << idx << " " << labels[idx] << std::endl << std::endl;
+        unlabeled.writeLine(bestex);
+        std::cout << bestex << " " << labels[bestex] << std::endl << std::endl;
     }
 }
