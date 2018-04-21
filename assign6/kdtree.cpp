@@ -34,7 +34,7 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
 
     //single row (leaf)
     if (end == start) {
-        std::cout << "LEAF" << std::endl;
+//        std::cout << "LEAF" << std::endl;
         candidate_best = sqrt(item.dist2(parent));
         if (candidate_best < best) {
             best = candidate_best;
@@ -48,15 +48,15 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
     //parent cases
     else {
         //Try lower half
-        std::cout << "LOWER" << std::endl;
+//        std::cout << "LOWER" << std::endl;
         if (item.get(0, col) <= parent.get(0, col)) {
             //try first child if it is there
             if (split - start > 0) {
-                std::cout << "CHILD1" << std::endl;
+//                std::cout << "CHILD1" << std::endl;
                 nearest(tree, start, split - 1,
                         (col + 1) % tree.numCols(), item);
                 if (abs(item.get(0, col) - parent.get(0, col)) > best) {
-                    std::cout << "SHORTCUT" << std::endl;
+//                    std::cout << "SHORTCUT" << std::endl;
                     return;
                 }
             }
@@ -76,7 +76,7 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
 
             //try second child if it is there
             if (end - split > 0) {
-                std::cout << "CHILD2" << std::endl;
+//                std::cout << "CHILD2" << std::endl;
                 nearest(tree, split + 1, end, 
                         (col + 1) % tree.numCols(), item);
                 candidate_best = sqrt(item.dist2(child2));
@@ -90,13 +90,13 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
         //Try upper half
         else {
         //try second child if it is there
-        std::cout << "UPPER" << std::endl;
+//        std::cout << "UPPER" << std::endl;
             if (end - split > 0) {
-                std::cout << "CHILD2" << std::endl;
+//                std::cout << "CHILD2" << std::endl;
                 nearest(tree, split + 1, end, 
                         (col + 1) % tree.numCols(), item);
                 if (abs(item.get(0, col) - parent.get(0, col)) > best) {
-                    std::cout << "SHORTCUT" << std::endl;
+//                    std::cout << "SHORTCUT" << std::endl;
                     return;
                 }
             }
@@ -116,7 +116,7 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
 
             //try first child if it is there
             if (split - start > 0) {
-                std::cout << "CHILD1" << std::endl;
+//                std::cout << "CHILD1" << std::endl;
                 nearest(tree, start, split - 1, 
                         (col + 1) % tree.numCols(), item);
                 candidate_best = sqrt(item.dist2(child1));
