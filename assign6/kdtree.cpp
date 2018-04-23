@@ -30,6 +30,7 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
     Matrix child2 = tree.subMatrix(child2_idx, 0, 1, 0);
     float candidate_best;
 
+
     std::cout << "RANGE: " << start << "  to  " << end << std::endl;
 
     //single row (leaf)
@@ -161,6 +162,8 @@ int main(int argc, char *argv[]) {
         nearest(unlabeled, 0, unlabeled.numRows() - 1, 0, row);
         std::cout << "Ans:";
         unlabeled.writeLine(bestex);
-        std::cout << bestex << " " << labels[bestex] << std::endl << std::endl;
+        int orig_idx = x.get(bestex, 0);
+        std::cout << orig_idx << " " << labels[orig_idx] 
+            << std::endl << std::endl;
     }
 }
