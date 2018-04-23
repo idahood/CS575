@@ -56,7 +56,7 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
 //                std::cout << "CHILD1" << std::endl;
                 nearest(tree, start, split - 1,
                         (col + 1) % tree.numCols(), item);
-                if (abs(item.get(0, col) - parent.get(0, col)) > best) {
+                if (fabs(item.get(0, col) - parent.get(0, col)) > best) {
 //                    std::cout << "SHORTCUT" << std::endl;
                     return;
                 }
@@ -83,7 +83,7 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
                 candidate_best = sqrt(item.dist2(child2));
                 if (candidate_best < best) {
                     best = candidate_best;
-                    bestex = child1_idx;
+                    bestex = child2_idx;
                 }
             }
         }
@@ -96,7 +96,7 @@ void nearest(const Matrix &tree, int start, int end, int col, Matrix &item) {
 //                std::cout << "CHILD2" << std::endl;
                 nearest(tree, split + 1, end, 
                         (col + 1) % tree.numCols(), item);
-                if (abs(item.get(0, col) - parent.get(0, col)) > best) {
+                if (fabs(item.get(0, col) - parent.get(0, col)) > best) {
 //                    std::cout << "SHORTCUT" << std::endl;
                     return;
                 }
