@@ -5,7 +5,7 @@
 #
 import sys
 from math import *
-
+#poop
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
 #
 # IO support for reading from stdin and writing to stdout
